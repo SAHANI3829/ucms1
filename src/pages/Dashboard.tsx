@@ -40,16 +40,37 @@ const Dashboard = () => {
 
     setSession(currentSession);
 
-    // Check user role
-    const { data: roles } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", currentSession.user.id)
-      .limit(1)
-      .maybeSingle();
+    // Check user role with retry logic for newly created users
+    let retries = 3;
+    let roles = null;
+    
+    while (retries > 0 && !roles) {
+      const { data } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", currentSession.user.id)
+        .limit(1)
+        .maybeSingle();
+      
+      roles = data;
+      
+      if (!roles && retries > 1) {
+        // Wait a bit before retrying
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+      retries--;
+    }
 
     if (roles) {
       setUserRole(roles.role);
+    } else {
+      // If still no role after retries, default to student
+      setUserRole('student');
+      toast({
+        title: "Notice",
+        description: "Role not found, defaulting to student view",
+        variant: "destructive",
+      });
     }
 
     setLoading(false);

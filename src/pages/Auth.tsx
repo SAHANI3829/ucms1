@@ -103,7 +103,13 @@ const Auth = () => {
             role: formData.role,
           });
 
-        if (roleError) throw roleError;
+        if (roleError) {
+          console.error("Role insertion error:", roleError);
+          throw new Error(`Failed to set user role: ${roleError.message}`);
+        }
+        
+        // Wait a moment to ensure role is committed
+        await new Promise(resolve => setTimeout(resolve, 300));
       }
 
       toast({
