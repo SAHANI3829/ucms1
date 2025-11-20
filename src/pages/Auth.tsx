@@ -22,6 +22,7 @@ const Auth = () => {
     email: "",
     password: "",
     fullName: "",
+    role: "student" as "admin" | "student" | "lecturer",
   });
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -80,7 +81,7 @@ const Auth = () => {
     try {
       authSchema.parse(formData);
 
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {
@@ -92,6 +93,18 @@ const Auth = () => {
       });
 
       if (error) throw error;
+
+      // Insert role into user_roles table
+      if (data.user) {
+        const { error: roleError } = await supabase
+          .from("user_roles")
+          .insert({
+            user_id: data.user.id,
+            role: formData.role,
+          });
+
+        if (roleError) throw roleError;
+      }
 
       toast({
         title: "Success",
@@ -156,16 +169,7 @@ const Auth = () => {
                   required
                 />
               </div>
-                <div className="text-right">
-                  <button
-                    type="button"
-                    onClick={() => setResetMode(true)}
-                    className="text-sm text-primary hover:underline"
-                  >
-                    Forgot password?
-                  </button>
-                </div>
-                <Button type="submit" className="w-full" disabled={isLoading}>
+              <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? "Sending..." : "Send Reset Link"}
               </Button>
               <Button
@@ -221,6 +225,15 @@ const Auth = () => {
                     required
                   />
                 </div>
+                <div className="text-right">
+                  <button
+                    type="button"
+                    onClick={() => setResetMode(true)}
+                    className="text-sm text-primary hover:underline"
+                  >
+                    Forgot password?
+                  </button>
+                </div>
                 <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading ? "Logging in..." : "Login"}
                 </Button>
@@ -261,6 +274,20 @@ const Auth = () => {
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     required
                   />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="signup-role">Role</Label>
+                  <select
+                    id="signup-role"
+                    value={formData.role}
+                    onChange={(e) => setFormData({ ...formData, role: e.target.value as "admin" | "student" | "lecturer" })}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    required
+                  >
+                    <option value="student">Student</option>
+                    <option value="lecturer">Lecturer</option>
+                    <option value="admin">Admin</option>
+                  </select>
                 </div>
                 <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading ? "Creating Account..." : "Sign Up"}

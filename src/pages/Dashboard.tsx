@@ -114,10 +114,15 @@ const Dashboard = () => {
 
       <main className="container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-3xl font-bold">Admin Dashboard - All Courses</h2>
-          <Button onClick={() => setDialogOpen(true)}>
-            Add New Course
-          </Button>
+          <h2 className="text-3xl font-bold">Admin Dashboard</h2>
+          <div className="space-x-2">
+            <Button onClick={() => navigate("/create-user")}>
+              Create New User
+            </Button>
+            <Button onClick={() => setDialogOpen(true)}>
+              Add New Course
+            </Button>
+          </div>
         </div>
 
         <CourseList isAdmin={true} />
