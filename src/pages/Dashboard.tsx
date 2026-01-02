@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "../integrations/supabase/client.ts";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
-import StudentDashboard from "./StudentDashboard";
-import LecturerDashboard from "./LecturerDashboard";
-import CourseList from "@/components/CourseList";
-import CourseDialog from "@/components/CourseDialog";
+import { Button } from "../components/ui/button.tsx";
+import { useToast } from "../hooks/use-toast.ts";
+import StudentDashboard from "./StudentDashboard.tsx";
+import LecturerDashboard from "./LecturerDashboard.tsx";
+import CourseList from "../components/CourseList.tsx";
+import CourseDialog from "../components/CourseDialog.tsx";
 import type { Session } from "@supabase/supabase-js";
+import { safeGetSession } from "../lib/safeAuth.ts";
 
 const Dashboard = () => {
   const [session, setSession] = useState<Session | null>(null);
@@ -31,8 +32,16 @@ const Dashboard = () => {
   }, [navigate]);
 
   const checkAuth = async () => {
-    const { data: { session: currentSession } } = await supabase.auth.getSession();
-    
+    const { session: currentSession, error } = await safeGetSession();
+
+    if (error && (error as any).code === "refresh_token_not_found") {
+      toast({
+        title: "Session expired",
+        description: "Please log in again.",
+        variant: "destructive",
+      });
+    }
+
     if (!currentSession) {
       navigate("/auth");
       return;

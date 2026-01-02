@@ -57,6 +57,14 @@ const LecturerDashboard = () => {
     navigate(`/enrollments/${courseId}`);
   };
 
+  const handleViewAssignments = (courseId: string) => {
+    navigate(`/lecturer/courses/${courseId}/assignments`);
+  };
+
+  const handleViewProgress = (courseId: string) => {
+    navigate(`/lecturer/progress/${courseId}`);
+  };
+
   if (loading) {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
   }
@@ -89,11 +97,18 @@ const LecturerDashboard = () => {
                 </CardHeader>
                 <CardContent className="space-y-2">
                   <Button 
-                    onClick={() => handleCreateAssignment(course.id)} 
+                    onClick={() => handleViewAssignments(course.id)} 
                     className="w-full"
                     variant="default"
                   >
-                    Create Assignment
+                    View Assignments
+                  </Button>
+                  <Button 
+                    onClick={() => handleViewProgress(course.id)} 
+                    className="w-full"
+                    variant="secondary"
+                  >
+                    Student Progress
                   </Button>
                   <Button 
                     onClick={() => handleViewEnrollments(course.id)} 
