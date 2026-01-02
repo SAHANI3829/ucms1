@@ -1,1 +1,22 @@
-project_id = "qwruxayzvcjsejiioobd"
+project_id = "aobxphknjeyclzzonygm"
+
+[functions.send-notification]
+verify_jwt = false
+
+[functions.course-service]
+verify_jwt = true
+
+[functions.assignment-service]
+verify_jwt = true
+
+[functions.enrollment-service]
+verify_jwt = true
+
+[functions.submission-service]
+verify_jwt = true
+
+[functions.grading-service]
+verify_jwt = true
+
+[functions.analytics-service]
+verify_jwt = true
